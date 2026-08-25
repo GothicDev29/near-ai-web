@@ -1,129 +1,175 @@
 "use client";
 
-import { useState } from "react";
-import { z } from "zod";
+import { useEffect, useRef, useState } from "react";
 import { toast } from "sonner";
+import {
+  AI_STAGE_OPTIONS,
+  COMPANY_SIZE_OPTIONS,
+  INTEREST_OPTIONS,
+  MONTHLY_SPEND_OPTIONS,
+  SENSITIVE_DATA_OPTIONS,
+  WORK_EMAIL_MESSAGE,
+  isFreeEmail,
+  screen1Schema,
+  screen2Schema,
+  screen3Schema,
+  type Attribution,
+  type ContactFormState,
+} from "@/lib/contact-form";
 
-const step1Schema = z.object({
-  contactName: z.string().min(1, "Your name is required"),
-  companyName: z.string().min(1, "Company name is required"),
-  email: z.string().email("Please enter a valid email"),
-  phone: z.string().optional(),
-});
+export type Screen = 1 | 2 | 3 | 4;
 
-const step2Schema = z.object({
-  solutionDescription: z.string().min(1, "Please describe your solution"),
-  productCategory: z.string().min(1, "Please select a category"),
-  timeZone: z.string().optional(),
-});
+type FormErrors = Partial<Record<keyof ContactFormState, string>>;
 
-const fullSchema = step1Schema.merge(step2Schema);
-type ContactForm = z.infer<typeof fullSchema>;
-type FormErrors = Partial<Record<keyof ContactForm, string>>;
-
-const CATEGORIES = [
-  "AI Agent",
-  "Data Pipeline",
-  "Healthcare",
-  "Finance",
-  "Legal",
-  "Security",
-  "Other",
-];
-
-const TIMEZONES = [
-  "PST (UTC-8)",
-  "MST (UTC-7)",
-  "CST (UTC-6)",
-  "EST (UTC-5)",
-  "GMT / UTC",
-  "CET (UTC+1)",
-  "JST (UTC+9)",
-  "Other",
-];
-
-const EMPTY: ContactForm = {
-  contactName: "",
-  companyName: "",
+const EMPTY = {
+  fullName: "",
   email: "",
-  phone: "",
-  solutionDescription: "",
-  productCategory: "",
-  timeZone: "",
+  interests: [] as string[],
+  useCase: "",
+  aiStage: "",
+  sensitiveData: "",
+  monthlyAiSpend: "",
+  companySize: "",
+  newsletterOptIn: false,
 };
 
+type FormState = typeof EMPTY;
+
+const USE_CASE_PLACEHOLDER =
+  "Tell us about your use case, the data involved, your current AI stack, and what you need from NEAR AI.";
+
 export default function GetInTouchForm({
-  onStepChange,
-  onSuccess,
+  onScreenChange,
+  entryPoint = "site-header",
 }: {
-  onStepChange?: (step: 1 | 2) => void;
-  onSuccess?: () => void;
+  onScreenChange?: (screen: Screen) => void;
+  entryPoint?: string;
 }) {
-  const [step, _setStep] = useState<1 | 2>(1);
-  const [form, setForm] = useState<ContactForm>(() => ({ ...EMPTY }));
+  const [screen, _setScreen] = useState<Screen>(1);
+  const [form, setForm] = useState<FormState>(() => ({ ...EMPTY }));
   const [errors, setErrors] = useState<FormErrors>({});
   const [submitting, setSubmitting] = useState(false);
-  const [selectedChip, setSelectedChip] = useState("");
+  const attribution = useRef<Attribution>({ entryPoint });
 
-  function setStep(next: 1 | 2) {
-    _setStep(next);
-    onStepChange?.(next);
+  // Captured once on mount: the query string and referrer are gone by the time
+  // the user reaches the last screen if they navigate in between.
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    attribution.current = {
+      entryPoint,
+      utmSource: params.get("utm_source") ?? undefined,
+      utmMedium: params.get("utm_medium") ?? undefined,
+      utmCampaign: params.get("utm_campaign") ?? undefined,
+      utmContent: params.get("utm_content") ?? undefined,
+      utmTerm: params.get("utm_term") ?? undefined,
+      referrer: document.referrer || undefined,
+      landingPage: window.location.href,
+    };
+  }, [entryPoint]);
+
+  function setScreen(next: Screen) {
+    _setScreen(next);
+    onScreenChange?.(next);
   }
 
-  function reset() {
-    setStep(1);
-    setForm({ ...EMPTY });
-    setErrors({});
-    setSelectedChip("");
-  }
-
-  function set(field: keyof ContactForm, value: string) {
+  function set<K extends keyof FormState>(field: K, value: FormState[K]) {
     setForm((f) => ({ ...f, [field]: value }));
-    if (errors[field]) setErrors((e) => ({ ...e, [field]: undefined }));
+    if (errors[field as keyof FormErrors]) {
+      setErrors((e) => ({ ...e, [field]: undefined }));
+    }
   }
 
-  function handleContinue() {
-    const parsed = step1Schema.safeParse(form);
-    if (!parsed.success) {
-      const fieldErrors: FormErrors = {};
-      for (const issue of parsed.error.issues) {
-        const key = issue.path[0] as keyof ContactForm;
-        if (!fieldErrors[key]) fieldErrors[key] = issue.message;
-      }
-      setErrors(fieldErrors);
-      return;
+  function toggleInterest(option: string) {
+    setForm((f) => ({
+      ...f,
+      interests: f.interests.includes(option)
+        ? f.interests.filter((i) => i !== option)
+        : [...f.interests, option],
+    }));
+    if (errors.interests) setErrors((e) => ({ ...e, interests: undefined }));
+  }
+
+  /** Maps a Zod failure onto per-field messages. Returns true when valid. */
+  function validate(schema: { safeParse: (v: unknown) => any }, value: unknown) {
+    const parsed = schema.safeParse(value);
+    if (parsed.success) {
+      setErrors({});
+      return true;
     }
-    setErrors({});
-    setStep(2);
+    const fieldErrors: FormErrors = {};
+    for (const issue of parsed.error.issues) {
+      const key = issue.path[0] as keyof ContactFormState;
+      if (key && !fieldErrors[key]) fieldErrors[key] = issue.message;
+    }
+    setErrors(fieldErrors);
+    return false;
+  }
+
+  /**
+   * Screens 1 and 2 sync in the background: Attio takes a couple of seconds and
+   * the route never fails the user over it, so there is nothing to wait for.
+   */
+  function syncInBackground(payload: Record<string, unknown>) {
+    void fetch("/api/contact", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(payload),
+    }).catch((err) => console.error("[contact] background sync failed:", err));
+  }
+
+  function handleScreen1() {
+    if (!validate(screen1Schema, form)) return;
+
+    attribution.current.submittedAt = new Date().toISOString();
+    syncInBackground({
+      step: 1,
+      fullName: form.fullName,
+      email: form.email,
+      interests: form.interests,
+      ...attribution.current,
+    });
+    setScreen(2);
+  }
+
+  function handleScreen2() {
+    if (!validate(screen2Schema, form)) return;
+
+    syncInBackground({
+      step: 2,
+      email: form.email,
+      useCase: form.useCase,
+      aiStage: form.aiStage,
+      sensitiveData: form.sensitiveData,
+    });
+    setScreen(3);
   }
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
-    const parsed = fullSchema.safeParse(form);
-    if (!parsed.success) {
-      const fieldErrors: FormErrors = {};
-      for (const issue of parsed.error.issues) {
-        const key = issue.path[0] as keyof ContactForm;
-        if (!fieldErrors[key]) fieldErrors[key] = issue.message;
-      }
-      setErrors(fieldErrors);
-      return;
-    }
+    if (!validate(screen3Schema, form)) return;
 
     setSubmitting(true);
     try {
       const res = await fetch("/api/contact", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(parsed.data),
+        body: JSON.stringify({ step: 3, ...form, ...attribution.current }),
       });
+
       if (!res.ok) {
-        const data = (await res.json()) as { error?: string };
-        throw new Error(data.error ?? "Something went wrong");
+        // An unhandled server error comes back with an empty body, so parsing
+        // it as JSON would mask the real failure with a parse error.
+        let message = "Something went wrong. Please try again.";
+        try {
+          const data = (await res.json()) as { error?: string };
+          if (data?.error) message = data.error;
+        } catch {
+          // Keep the generic message.
+        }
+        throw new Error(message);
       }
-      toast.success("We'll be in touch soon.");
-      reset();
-      onSuccess?.();
+
+      setScreen(4);
     } catch (err) {
       toast.error(
         err instanceof Error ? err.message : "Failed to send. Please try again."
@@ -133,7 +179,9 @@ export default function GetInTouchForm({
     }
   }
 
-  const firstName = form.contactName.trim().split(" ")[0];
+  if (screen === 4) return <Confirmation />;
+
+  const firstName = form.fullName.trim().split(" ")[0];
 
   return (
     <form onSubmit={handleSubmit}>
@@ -141,61 +189,72 @@ export default function GetInTouchForm({
         <div
           className="flex transition-transform duration-300 ease-in-out"
           style={{
-            width: "200%",
-            transform: step === 1 ? "translateX(0)" : "translateX(-50%)",
+            width: "300%",
+            transform: `translateX(-${(screen - 1) * (100 / 3)}%)`,
           }}
         >
-          {/* ── Step 1: Who are you ── */}
-          <div className="px-6 pt-5 pb-4 space-y-4" style={{ width: "50%" }}>
-            <div>
-              <p className="text-base text-gray-400">
-                Tell us who you are and we&apos;ll take it from there.
-              </p>
-            </div>
+          {/* ── Screen 1: Who are you ── */}
+          <div className="px-6 pt-5 pb-4 space-y-4" style={{ width: `${100 / 3}%` }}>
+            <p className="text-base text-gray-400">
+              Tell us who you are and we&apos;ll take it from there.
+            </p>
 
-            <Field label="Your Name" error={errors.contactName} required>
+            <Field label="Full Name" error={errors.fullName} required>
               <input
                 type="text"
-                value={form.contactName}
-                onChange={(e) => set("contactName", e.target.value)}
-                placeholder=""
-                className={inputCls(!!errors.contactName)}
+                value={form.fullName}
+                onChange={(e) => set("fullName", e.target.value)}
+                className={inputCls(!!errors.fullName)}
               />
             </Field>
 
-            <Field label="Company" error={errors.companyName} required>
-              <input
-                type="text"
-                value={form.companyName}
-                onChange={(e) => set("companyName", e.target.value)}
-                placeholder=""
-                className={inputCls(!!errors.companyName)}
-              />
-            </Field>
-
-            <Field label="Email" error={errors.email} required>
+            <Field label="Work Email" error={errors.email} required>
               <input
                 type="email"
                 value={form.email}
                 onChange={(e) => set("email", e.target.value)}
-                placeholder=""
+                onBlur={() => {
+                  if (form.email && isFreeEmail(form.email)) {
+                    setErrors((prev) => ({ ...prev, email: WORK_EMAIL_MESSAGE }));
+                  }
+                }}
                 className={inputCls(!!errors.email)}
               />
             </Field>
 
-            <Field label="Phone" error={errors.phone}>
-              <input
-                type="tel"
-                value={form.phone}
-                onChange={(e) => set("phone", e.target.value)}
-                placeholder=""
-                className={inputCls(false)}
-              />
-            </Field>
+            <div className="flex flex-col gap-1.5">
+              <label className="text-base font-medium text-gray-700">
+                What are you interested in?
+                <span className="text-red-500 ml-0.5">*</span>
+              </label>
+              <div className="flex flex-wrap gap-2">
+                {INTEREST_OPTIONS.map((option) => {
+                  const selected = form.interests.includes(option);
+                  return (
+                    <button
+                      key={option}
+                      type="button"
+                      aria-pressed={selected}
+                      onClick={() => toggleInterest(option)}
+                      className={`px-3 py-1.5 rounded-full text-sm font-medium border transition-colors cursor-pointer ${
+                        selected
+                          ? "bg-black text-white border-black"
+                          : "bg-white text-gray-600 border-gray-200 hover:border-gray-400"
+                      }`}
+                    >
+                      {option}
+                    </button>
+                  );
+                })}
+              </div>
+              {errors.interests && (
+                <p className="text-sm text-red-500">{errors.interests}</p>
+              )}
+            </div>
           </div>
 
-          {/* ── Step 2: What are you building ── */}
-          <div className="px-6 pt-5 pb-6 space-y-4" style={{ width: "50%" }}>
+          {/* ── Screen 2: What are you building ── */}
+          <div className="px-6 pt-5 pb-4 space-y-4" style={{ width: `${100 / 3}%` }}>
             <div>
               {firstName && (
                 <p className="text-sm text-gray-400 font-medium uppercase tracking-widest mb-1">
@@ -208,121 +267,119 @@ export default function GetInTouchForm({
             </div>
 
             <Field
-              label="What are you trying to build?"
-              error={errors.solutionDescription}
+              label="Briefly describe what you are trying to build or deploy"
+              error={errors.useCase}
               required
             >
               <textarea
-                value={form.solutionDescription}
-                onChange={(e) => set("solutionDescription", e.target.value)}
-                placeholder=""
-                rows={2}
-                className={inputCls(!!errors.solutionDescription)}
+                value={form.useCase}
+                onChange={(e) => set("useCase", e.target.value)}
+                placeholder={USE_CASE_PLACEHOLDER}
+                rows={4}
+                className={inputCls(!!errors.useCase)}
               />
             </Field>
 
-            {/* Category chips */}
-            <div className="flex flex-col gap-1.5">
-              <label className="text-base font-medium text-gray-700">
-                What best describes your project?
-                <span className="text-red-500 ml-0.5">*</span>
-              </label>
-              <div className="flex flex-wrap gap-2">
-                {CATEGORIES.map((cat) => (
-                  <button
-                    key={cat}
-                    type="button"
-                    onClick={() => {
-                      setSelectedChip(cat);
-                      if (cat !== "Other") {
-                        set("productCategory", cat);
-                      } else {
-                        set("productCategory", "");
-                      }
-                    }}
-                    className={`px-3 py-1.5 rounded-full text-sm font-medium border transition-colors cursor-pointer ${
-                      selectedChip === cat
-                        ? "bg-black text-white border-black"
-                        : "bg-white text-gray-600 border-gray-200 hover:border-gray-400"
-                    }`}
-                  >
-                    {cat}
-                  </button>
-                ))}
-              </div>
-              {selectedChip === "Other" && (
-                <input
-                  type="text"
-                  autoFocus
-                  value={form.productCategory}
-                  onChange={(e) => set("productCategory", e.target.value)}
-                  placeholder="Describe your product or category"
-                  className={inputCls(!!errors.productCategory)}
-                />
-              )}
-              {errors.productCategory && (
-                <p className="text-sm text-red-500">{errors.productCategory}</p>
-              )}
-            </div>
+            <Field label="How are you using AI today?" error={errors.aiStage} required>
+              <Select
+                value={form.aiStage}
+                onChange={(v) => set("aiStage", v)}
+                options={AI_STAGE_OPTIONS}
+                hasError={!!errors.aiStage}
+              />
+            </Field>
 
-            <div className="flex flex-col gap-1.5">
-              <label className="text-base font-medium text-gray-700">
-                Best time zone to contact
-              </label>
-              <select
-                value={form.timeZone ?? ""}
-                onChange={(e) => {
-                  set("timeZone", e.target.value);
-                }}
-                className="w-full rounded-lg border border-gray-200 px-3 py-2 text-base text-gray-700 outline-none focus:ring-2 focus:ring-black/10 focus:border-gray-400 bg-white cursor-pointer"
-              >
-                <option value="">Select a time zone…</option>
-                {TIMEZONES.filter((tz) => tz !== "Other").map((tz) => (
-                  <option key={tz} value={tz}>{tz}</option>
-                ))}
-                <option value="Other">Other</option>
-              </select>
-              {form.timeZone === "Other" && (
-                <input
-                  type="text"
-                  autoFocus
-                  value={form.timeZone ?? ""}
-                  onChange={(e) => set("timeZone", e.target.value)}
-                  placeholder="Enter your time zone"
-                  className={inputCls(false)}
-                />
-              )}
-            </div>
+            <Field
+              label="Does this workload involve sensitive, regulated, confidential, or proprietary data?"
+              error={errors.sensitiveData}
+              required
+            >
+              <Select
+                value={form.sensitiveData}
+                onChange={(v) => set("sensitiveData", v)}
+                options={SENSITIVE_DATA_OPTIONS}
+                hasError={!!errors.sensitiveData}
+              />
+            </Field>
+          </div>
 
+          {/* ── Screen 3: Scale ── */}
+          <div className="px-6 pt-5 pb-4 space-y-4" style={{ width: `${100 / 3}%` }}>
+            <Field
+              label="What are you currently spending each month on AI APIs, GPU infrastructure, or model hosting?"
+              error={errors.monthlyAiSpend}
+              required
+            >
+              <Select
+                value={form.monthlyAiSpend}
+                onChange={(v) => set("monthlyAiSpend", v)}
+                options={MONTHLY_SPEND_OPTIONS}
+                hasError={!!errors.monthlyAiSpend}
+              />
+            </Field>
+
+            <Field
+              label="How many employees does your company have?"
+              error={errors.companySize}
+              required
+            >
+              <Select
+                value={form.companySize}
+                onChange={(v) => set("companySize", v)}
+                options={COMPANY_SIZE_OPTIONS}
+                hasError={!!errors.companySize}
+              />
+            </Field>
+
+            <label className="flex items-start gap-2.5 cursor-pointer pt-1">
+              <input
+                type="checkbox"
+                checked={form.newsletterOptIn}
+                onChange={(e) => set("newsletterOptIn", e.target.checked)}
+                className="mt-1 h-4 w-4 rounded border-gray-300 accent-black cursor-pointer"
+              />
+              <span className="text-base text-gray-700">
+                Keep me updated on NEAR AI products, models, and company news.
+              </span>
+            </label>
           </div>
         </div>
       </div>
 
-      {/* Buttons — always pinned to bottom of the card */}
-      <div className="px-6 pb-6">
-        {step === 1 ? (
+      {/* Buttons — always pinned to the bottom of the card */}
+      <div className="px-6 pb-6 pt-2">
+        {screen === 1 && (
           <button
             type="button"
-            onClick={handleContinue}
-            className="w-full bg-black text-white py-2.5 rounded-lg text-base font-medium hover:bg-black/85 transition-colors cursor-pointer"
+            onClick={handleScreen1}
+            className={primaryBtn + " w-full"}
           >
             Tell us about your project →
           </button>
-        ) : (
+        )}
+
+        {screen === 2 && (
           <div className="flex gap-3">
-            <button
-              type="button"
-              onClick={() => setStep(1)}
-              className="flex-1 border border-gray-200 text-gray-600 py-2.5 rounded-lg text-base font-medium hover:border-gray-400 transition-colors cursor-pointer"
-            >
+            <button type="button" onClick={() => setScreen(1)} className={backBtn}>
+              ← Back
+            </button>
+            <button type="button" onClick={handleScreen2} className={primaryBtn + " flex-[2]"}>
+              Continue →
+            </button>
+          </div>
+        )}
+
+        {screen === 3 && (
+          <div className="flex gap-3">
+            <button type="button" onClick={() => setScreen(2)} className={backBtn}>
               ← Back
             </button>
             <button
               type="submit"
               disabled={submitting}
-              className="flex-[2] bg-black text-white py-2.5 rounded-lg text-base font-medium hover:bg-black/85 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+              className={primaryBtn + " flex-[2] disabled:opacity-50 disabled:cursor-not-allowed"}
             >
-              {submitting ? "Sending..." : "Request a Discovery Call"}
+              {submitting ? "Submitting..." : "Submit"}
             </button>
           </div>
         )}
@@ -331,9 +388,72 @@ export default function GetInTouchForm({
   );
 }
 
+function Confirmation() {
+  return (
+    <div className="px-6 pt-6 pb-7 space-y-3">
+      <h3 className="text-xl font-bold text-gray-900">Thanks, we&apos;ve got it.</h3>
+      <p className="text-base text-gray-600">
+        We read every submission and follow up where we can help.
+      </p>
+      <p className="text-base text-gray-600">
+        No need to wait on us, though. Get an API key and start building in a couple
+        of minutes.
+      </p>
+      <p className="text-base text-gray-700 pt-1">
+        <a href="https://cloud.near.ai/signin" target="_blank" rel="noopener noreferrer" className="font-medium underline underline-offset-4 hover:text-black">
+          Get an API key
+        </a>
+        <span className="text-gray-400"> · </span>
+        <a href="https://docs.near.ai/cloud/quickstart" target="_blank" rel="noopener noreferrer" className="font-medium underline underline-offset-4 hover:text-black">
+          Docs
+        </a>
+        <span className="text-gray-400"> · </span>
+        <a href="https://ironclaw.com/" target="_blank" rel="noopener noreferrer" className="font-medium underline underline-offset-4 hover:text-black">
+          IronClaw
+        </a>
+      </p>
+    </div>
+  );
+}
+
+function Select({
+  value,
+  onChange,
+  options,
+  hasError,
+}: {
+  value: string;
+  onChange: (value: string) => void;
+  options: readonly string[];
+  hasError: boolean;
+}) {
+  return (
+    <select
+      value={value}
+      onChange={(e) => onChange(e.target.value)}
+      className={`w-full rounded-lg border px-3 py-2 text-base outline-none transition-colors bg-white cursor-pointer focus:ring-2 focus:ring-black/10 focus:border-gray-400 ${
+        hasError ? "border-red-400 bg-red-50" : "border-gray-200"
+      } ${value ? "text-gray-700" : "text-gray-400"}`}
+    >
+      <option value="">Select an option…</option>
+      {options.map((option) => (
+        <option key={option} value={option} className="text-gray-700">
+          {option}
+        </option>
+      ))}
+    </select>
+  );
+}
+
+const primaryBtn =
+  "bg-black text-white py-2.5 rounded-lg text-base font-medium hover:bg-black/85 transition-colors cursor-pointer";
+const backBtn =
+  "flex-1 border border-gray-200 text-gray-600 py-2.5 rounded-lg text-base font-medium hover:border-gray-400 transition-colors cursor-pointer";
+
 function inputCls(hasError: boolean) {
   return [
     "w-full rounded-lg border px-3 py-2 text-base outline-none transition-colors",
+    "placeholder:text-gray-400",
     "focus:ring-2 focus:ring-black/10 focus:border-gray-400",
     hasError
       ? "border-red-400 bg-red-50 focus:ring-red-200"
