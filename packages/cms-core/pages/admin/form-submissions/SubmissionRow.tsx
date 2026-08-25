@@ -2,29 +2,35 @@
 
 import React, { useState } from "react";
 import { StatusSelect } from "./StatusSelect";
-
-type FDEData = {
-  contactName?: string;
-  companyName?: string;
-  email?: string;
-  phone?: string;
-  productCategory?: string;
-  solutionDescription?: string;
-  timeZone?: string;
-};
+import {
+  detailFields,
+  summarize,
+  type SubmissionData,
+} from "@cms/lib/form-submissions";
 
 type Props = {
   sub: {
     id: string;
+    formId: string;
     status: string;
-    data?: Record<string, unknown>;
+    data?: unknown;
   };
   formattedDate: string;
 };
 
+/** The stored JSON is untyped, so narrow it instead of asserting a shape. */
+function toData(value: unknown): SubmissionData {
+  return value && typeof value === "object" && !Array.isArray(value)
+    ? (value as SubmissionData)
+    : {};
+}
+
 export function SubmissionRow({ sub, formattedDate }: Props) {
   const [open, setOpen] = useState(false);
-  const d = (sub.data ?? {}) as FDEData;
+
+  const data = toData(sub.data);
+  const { contact, companyOrDomain, email } = summarize(sub.formId, data);
+  const details = detailFields(sub.formId, data);
 
   return (
     <React.Fragment>
@@ -32,12 +38,12 @@ export function SubmissionRow({ sub, formattedDate }: Props) {
         <td className="px-6 py-4 text-sm text-muted-foreground whitespace-nowrap">
           {formattedDate}
         </td>
-        <td className="px-6 py-4 text-sm font-medium">{d.contactName ?? "—"}</td>
-        <td className="px-6 py-4 text-sm">{d.companyName ?? "—"}</td>
+        <td className="px-6 py-4 text-sm font-medium">{contact ?? "—"}</td>
+        <td className="px-6 py-4 text-sm">{companyOrDomain ?? "—"}</td>
         <td className="px-6 py-4 text-sm">
-          {d.email ? (
-            <a href={`mailto:${d.email}`} className="hover:text-primary transition">
-              {d.email}
+          {email ? (
+            <a href={`mailto:${email}`} className="hover:text-primary transition">
+              {email}
             </a>
           ) : "—"}
         </td>
@@ -64,27 +70,36 @@ export function SubmissionRow({ sub, formattedDate }: Props) {
       {open && (
         <tr>
           <td colSpan={6} className="p-0">
-            <div className="px-6 pt-4 pb-5 bg-muted/5 border-t border-border/40 flex items-start justify-end gap-12">
-              <div>
-                <p className="text-[10px] font-semibold uppercase tracking-widest text-muted-foreground mb-1">Category</p>
-                <p className="text-sm">{d.productCategory ?? "—"}</p>
-              </div>
-              {d.phone && (
-                <div>
-                  <p className="text-[10px] font-semibold uppercase tracking-widest text-muted-foreground mb-1">Phone</p>
-                  <p className="text-sm">{d.phone}</p>
-                </div>
-              )}
-              {d.timeZone && (
-                <div>
-                  <p className="text-[10px] font-semibold uppercase tracking-widest text-muted-foreground mb-1">Time Zone</p>
-                  <p className="text-sm">{d.timeZone}</p>
-                </div>
-              )}
-              {d.solutionDescription && (
-                <div>
-                  <p className="text-[10px] font-semibold uppercase tracking-widest text-muted-foreground mb-1">Solution Description</p>
-                  <p className="text-sm text-foreground/80 whitespace-pre-wrap leading-relaxed">{d.solutionDescription}</p>
+            <div className="px-6 pt-4 pb-5 bg-muted/5 border-t border-border/40">
+              <p className="text-[10px] font-semibold uppercase tracking-widest text-muted-foreground/60 mb-3">
+                {sub.formId}
+              </p>
+
+              {details.length === 0 ? (
+                <p className="text-sm text-muted-foreground">
+                  No additional fields on this submission.
+                </p>
+              ) : (
+                <div className="grid gap-x-12 gap-y-4 sm:grid-cols-2 lg:grid-cols-3">
+                  {details.map((field) => (
+                    <div
+                      key={field.label}
+                      className={field.multiline ? "sm:col-span-2 lg:col-span-3" : undefined}
+                    >
+                      <p className="text-[10px] font-semibold uppercase tracking-widest text-muted-foreground mb-1">
+                        {field.label}
+                      </p>
+                      <p
+                        className={
+                          field.multiline
+                            ? "text-sm text-foreground/80 whitespace-pre-wrap leading-relaxed"
+                            : "text-sm break-words"
+                        }
+                      >
+                        {field.value}
+                      </p>
+                    </div>
+                  ))}
                 </div>
               )}
             </div>

@@ -12,7 +12,7 @@ const VALID_STATUSES = ["NEW", "CONTACTED", "ARCHIVED"] as const;
 export default async function FormSubmissionsPage({
   searchParams,
 }: {
-  searchParams: Promise<{ page?: string; status?: string }>;
+  searchParams: Promise<{ page?: string; status?: string; formId?: string }>;
 }) {
   const session = await auth();
   const userRole = (session?.user as any)?.role;
@@ -25,7 +25,11 @@ export default async function FormSubmissionsPage({
     );
   }
 
-  const { page: pageParam, status: statusParam } = await searchParams;
+  const {
+    page: pageParam,
+    status: statusParam,
+    formId: formIdParam,
+  } = await searchParams;
   const page = Math.max(1, Number(pageParam ?? 1));
   const skip = (page - 1) * PAGE_SIZE;
 
@@ -33,8 +37,9 @@ export default async function FormSubmissionsPage({
   if (statusParam && (VALID_STATUSES as readonly string[]).includes(statusParam)) {
     where.status = statusParam;
   }
+  if (formIdParam) where.formId = formIdParam;
 
-  const [submissions, total] = await Promise.all([
+  const [submissions, total, formGroups] = await Promise.all([
     (prisma as any).formSubmission.findMany({
       where,
       orderBy: { createdAt: "desc" },
@@ -42,14 +47,23 @@ export default async function FormSubmissionsPage({
       skip,
     }),
     (prisma as any).formSubmission.count({ where }),
+    // Form versions coexist in this table, so the filter is built from the data.
+    (prisma as any).formSubmission.groupBy({
+      by: ["formId"],
+      _count: { _all: true },
+      orderBy: { formId: "asc" },
+    }),
   ]);
 
+  const formIds: string[] = formGroups.map((g: any) => g.formId);
+
   const totalPages = Math.ceil(total / PAGE_SIZE);
-  const hasFilters = !!statusParam;
+  const hasFilters = !!statusParam || !!formIdParam;
 
   function buildPageUrl(p: number) {
     const params = new URLSearchParams();
     if (statusParam) params.set("status", statusParam);
+    if (formIdParam) params.set("formId", formIdParam);
     params.set("page", String(p));
     return `/admin/form-submissions?${params.toString()}`;
   }
@@ -58,7 +72,15 @@ export default async function FormSubmissionsPage({
     <div className="space-y-8">
       <div className="flex items-center justify-between">
         <h1 className="text-4xl font-bold">Form Submissions</h1>
-        <span className="text-sm text-muted-foreground">{total} total</span>
+        <div className="flex items-center gap-4">
+          <span className="text-sm text-muted-foreground">{total} total</span>
+          {/* Exports every submission, not just the current page or filter. */}
+          <Button asChild variant="outline" size="sm">
+            <a href="/api/form-submissions/export" download>
+              Export all (CSV)
+            </a>
+          </Button>
+        </div>
       </div>
 
       {/* Filters */}
@@ -71,6 +93,16 @@ export default async function FormSubmissionsPage({
           <option value="">All statuses</option>
           {VALID_STATUSES.map((s) => (
             <option key={s} value={s}>{s}</option>
+          ))}
+        </select>
+        <select
+          name="formId"
+          defaultValue={formIdParam ?? ""}
+          className="border border-border rounded-[var(--radius)] px-3 py-2 text-sm bg-background text-foreground focus:outline-none focus:ring-2 focus:ring-primary/50"
+        >
+          <option value="">All forms</option>
+          {formIds.map((f) => (
+            <option key={f} value={f}>{f}</option>
           ))}
         </select>
         <Button type="submit" variant="outline" size="sm">Filter</Button>
@@ -94,7 +126,7 @@ export default async function FormSubmissionsPage({
                   <tr className="border-b bg-muted/30">
                     <th className="px-6 py-3 text-left font-medium text-sm">Date</th>
                     <th className="px-6 py-3 text-left font-medium text-sm">Contact</th>
-                    <th className="px-6 py-3 text-left font-medium text-sm">Company</th>
+                    <th className="px-6 py-3 text-left font-medium text-sm">Company / Domain</th>
                     <th className="px-6 py-3 text-left font-medium text-sm">Email</th>
                     <th className="px-6 py-3 text-left font-medium text-sm">Status</th>
                     <th className="px-6 py-3" />
