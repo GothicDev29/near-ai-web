@@ -49,7 +49,11 @@ export default function GetInTouchForm({
   const [form, setForm] = useState<FormState>(() => ({ ...EMPTY }));
   const [errors, setErrors] = useState<FormErrors>({});
   const [submitting, setSubmitting] = useState(false);
+  const [syncing, setSyncing] = useState(false);
   const attribution = useRef<Attribution>({ entryPoint });
+  // A ref, not the state above: React re-renders asynchronously, so two clicks
+  // landing in the same tick would both read a stale `syncing === false`.
+  const syncingRef = useRef(false);
 
   // Captured once on mount: the query string and referrer are gone by the time
   // the user reaches the last screen if they navigate in between.
@@ -110,14 +114,25 @@ export default function GetInTouchForm({
    * the route never fails the user over it, so there is nothing to wait for.
    */
   function syncInBackground(payload: Record<string, unknown>) {
+    syncingRef.current = true;
+    setSyncing(true);
+
     void fetch("/api/contact", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(payload),
-    }).catch((err) => console.error("[contact] background sync failed:", err));
+    })
+      .catch((err) => console.error("[contact] background sync failed:", err))
+      .finally(() => {
+        syncingRef.current = false;
+        setSyncing(false);
+      });
   }
 
   function handleScreen1() {
+    // Step 1 also creates the list entry, and that POST does not deduplicate:
+    // a second click before the sync settles would add a second entry.
+    if (syncingRef.current) return;
     if (!validate(screen1Schema, form)) return;
 
     attribution.current.submittedAt = new Date().toISOString();
@@ -132,6 +147,7 @@ export default function GetInTouchForm({
   }
 
   function handleScreen2() {
+    if (syncingRef.current) return;
     if (!validate(screen2Schema, form)) return;
 
     syncInBackground({
@@ -352,7 +368,8 @@ export default function GetInTouchForm({
           <button
             type="button"
             onClick={handleScreen1}
-            className={primaryBtn + " w-full"}
+            disabled={syncing}
+            className={primaryBtn + " w-full" + disabledCls}
           >
             Tell us about your project →
           </button>
@@ -363,7 +380,12 @@ export default function GetInTouchForm({
             <button type="button" onClick={() => setScreen(1)} className={backBtn}>
               ← Back
             </button>
-            <button type="button" onClick={handleScreen2} className={primaryBtn + " flex-[2]"}>
+            <button
+              type="button"
+              onClick={handleScreen2}
+              disabled={syncing}
+              className={primaryBtn + " flex-[2]" + disabledCls}
+            >
               Continue →
             </button>
           </div>
@@ -377,7 +399,7 @@ export default function GetInTouchForm({
             <button
               type="submit"
               disabled={submitting}
-              className={primaryBtn + " flex-[2] disabled:opacity-50 disabled:cursor-not-allowed"}
+              className={primaryBtn + " flex-[2]" + disabledCls}
             >
               {submitting ? "Submitting..." : "Submit"}
             </button>
@@ -447,6 +469,8 @@ function Select({
 
 const primaryBtn =
   "bg-black text-white py-2.5 rounded-lg text-base font-medium hover:bg-black/85 transition-colors cursor-pointer";
+const disabledCls =
+  " disabled:opacity-50 disabled:cursor-not-allowed";
 const backBtn =
   "flex-1 border border-gray-200 text-gray-600 py-2.5 rounded-lg text-base font-medium hover:border-gray-400 transition-colors cursor-pointer";
 
