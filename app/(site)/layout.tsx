@@ -3,6 +3,7 @@ import BannerHost from "@near/cms-core/components/site/BannerHost";
 import LenisProvider from "@/components/site/providers/LenisProvider";
 import AnalyticsScripts from "@/components/site/AnalyticsScripts";
 import SiteFooter from "@/components/site/SiteFooter";
+import FloatingHeaderReveal from "@/components/site/FloatingHeaderReveal";
 
 export const revalidate = 60;
 
@@ -45,6 +46,7 @@ export default async function SiteLayout({ children }: { children: React.ReactNo
   return (
     <LenisProvider>
       <AnalyticsScripts />
+      <FloatingHeaderReveal />
       <BannerHost banners={banners as any} slot="top" />
       {children}
       <SiteFooter />

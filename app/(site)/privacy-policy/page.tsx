@@ -1,22 +1,34 @@
 import SiteHeader from "@/components/site/SiteHeader";
 
 
-const TOC = [
-  "Scope and Audience",
-  "Information We Collect",
-  "How We Use Personal Data",
-  "Legal Bases for Collecting and Processing Personal Data",
-  "Data Retention",
-  "How We Disclose Personal Data",
-  "Securing Your Personal Data",
-  "Your Rights",
-  "Additional Information for California Residents",
-  "International Transfers of Personal Data",
-  "Minors",
-  "Google User Data",
-  "Third-Party Links and Services",
-  "Changes to This Privacy Policy",
-  "Contact Information",
+const TOC: { id: string; num: string; title: string; subs?: { id: string; num: string; title: string }[] }[] = [
+  { id: "section-1", num: "1", title: "Scope and Audience" },
+  {
+    id: "section-2", num: "2", title: "Information We Collect",
+    subs: [{ id: "section-2-1", num: "2.1", title: "Analytics, Advertising, and Online Tracking" }],
+  },
+  { id: "section-3", num: "3", title: "How We Use Personal Data" },
+  { id: "section-4", num: "4", title: "Legal Bases for Collecting and Processing Personal Data" },
+  { id: "section-5", num: "5", title: "Data Retention" },
+  { id: "section-6", num: "6", title: "How We Disclose Personal Data" },
+  { id: "section-7", num: "7", title: "Securing Your Personal Data" },
+  {
+    id: "section-8", num: "8", title: "Your Rights",
+    subs: [
+      { id: "section-8-1", num: "8.1", title: "General Rights" },
+      { id: "section-8-2", num: "8.2", title: "Exercising Your Rights" },
+      { id: "section-8-3", num: "8.3", title: "Marketing Communications" },
+      { id: "section-8-4", num: "8.4", title: "Notice of Right to Opt Out of Sales and Targeted Advertising" },
+      { id: "section-8-5", num: "8.5", title: "Additional Rights for Users in the EEA, UK, and Other Applicable Jurisdictions" },
+    ],
+  },
+  { id: "section-9", num: "9", title: "Additional Information for California Residents" },
+  { id: "section-10", num: "10", title: "International Transfers of Personal Data" },
+  { id: "section-11", num: "11", title: "Minors" },
+  { id: "section-12", num: "12", title: "Google User Data" },
+  { id: "section-13", num: "13", title: "Third-Party Links and Services" },
+  { id: "section-14", num: "14", title: "Changes to This Privacy Policy" },
+  { id: "section-15", num: "15", title: "Contact Information" },
 ];
 
 export default function PrivacyPolicyPage() {
@@ -37,7 +49,7 @@ export default function PrivacyPolicyPage() {
                 Privacy Policy
               </h1>
               <p className="mt-3 font-mono text-[0.75rem] uppercase tracking-[0.25em] text-white/50">
-                Last Updated — May 7, 2026
+                Last Updated — August 10, 2026
               </p>
             </div>
           </div>
@@ -52,15 +64,30 @@ export default function PrivacyPolicyPage() {
               <aside className="hidden lg:block sticky top-12">
                 <p className="font-mono text-[0.7rem] uppercase tracking-[0.3em] text-muted mb-6">Contents</p>
                 <nav className="flex flex-col gap-2">
-                  {TOC.map((item, i) => (
-                    <a
-                      key={item}
-                      href={`#section-${i + 1}`}
-                      className="text-pretty text-muted hover:text-[#101010] transition-colors [font-size:var(--font-size-body)] leading-snug"
-                    >
-                      <span className="font-mono text-[0.7rem] mr-2 opacity-50">{i + 1}.</span>
-                      {item}
-                    </a>
+                  {TOC.map((item) => (
+                    <div key={item.id} className="flex flex-col gap-2">
+                      <a
+                        href={`#${item.id}`}
+                        className="text-pretty text-muted hover:text-[#101010] transition-colors [font-size:var(--font-size-body)] leading-snug"
+                      >
+                        <span className="font-mono text-[0.7rem] mr-2 opacity-50">{item.num}.</span>
+                        {item.title}
+                      </a>
+                      {item.subs && (
+                        <div className="flex flex-col gap-2 pl-6">
+                          {item.subs.map((sub) => (
+                            <a
+                              key={sub.id}
+                              href={`#${sub.id}`}
+                              className="text-pretty text-muted hover:text-[#101010] transition-colors [font-size:var(--font-size-body)] leading-snug opacity-80"
+                            >
+                              <span className="font-mono text-[0.7rem] mr-2 opacity-50">{sub.num}</span>
+                              {sub.title}
+                            </a>
+                          ))}
+                        </div>
+                      )}
+                    </div>
                   ))}
                 </nav>
               </aside>
@@ -74,7 +101,7 @@ export default function PrivacyPolicyPage() {
                     Jasnah Inc., d/b/a NEAR AI, a Delaware corporation, and its subsidiaries and affiliates (&ldquo;NEAR AI&rdquo; &ldquo;we,&rdquo; &ldquo;us,&rdquo; or &ldquo;our&rdquo;) respect your privacy.
                   </p>
                   <p className="text-pretty text-muted leading-[1.8]" style={{ fontSize: "var(--font-size-body)" }}>
-                    This Privacy Policy (&ldquo;Privacy Policy&rdquo; or &ldquo;Policy&rdquo;) explains how we collect, use, disclose, and store Personal Data about individuals (&ldquo;you&rdquo; or &ldquo;User&rdquo;) who interact with our websites, including www.near.ai, https://cloud.near.ai/, https://agent.near.ai/, and https://www.ironclaw.com/ (collectively the &ldquo;Websites&rdquo;), and our products, materials, and services provided through or on those sites (collectively, the &ldquo;Services&rdquo;).
+                    This Privacy Policy (&ldquo;Privacy Policy&rdquo; or &ldquo;Policy&rdquo;) explains how we collect, use, disclose, and store Personal Data about individuals (&ldquo;you&rdquo; or &ldquo;User&rdquo;) who interact with our websites, including www.near.ai, https://cloud.near.ai/, https://agent.near.ai/, https://www.ironclaw.com/, and https://hub.ironclaw.com/ (collectively the &ldquo;Websites&rdquo;), and our products, materials, and services provided through or on those sites (collectively, the &ldquo;Services&rdquo;).
                   </p>
                   <p className="text-pretty text-muted leading-[1.8]" style={{ fontSize: "var(--font-size-body)" }}>
                     This Privacy Policy applies to our activities as a &ldquo;data controller&rdquo; or &ldquo;business,&rdquo; as such terms are defined in applicable law. If you are an end-user of our customer and have questions about how we process information on behalf of that customer, please reach out directly to that customer.
@@ -83,10 +110,21 @@ export default function PrivacyPolicyPage() {
                   {/* Mobile TOC */}
                   <div className="lg:hidden mt-4 border border-[#CAC8C8] rounded-2xl p-6 flex flex-col gap-2">
                     <p className="font-mono text-[0.7rem] uppercase tracking-[0.3em] text-muted mb-2">Contents</p>
-                    {TOC.map((item, i) => (
-                      <a key={item} href={`#section-${i + 1}`} className="text-pretty text-muted [font-size:var(--font-size-body)] leading-snug">
-                        <span className="font-mono text-[0.7rem] mr-2 opacity-50">{i + 1}.</span>{item}
-                      </a>
+                    {TOC.map((item) => (
+                      <div key={item.id} className="flex flex-col gap-2">
+                        <a href={`#${item.id}`} className="text-pretty text-muted [font-size:var(--font-size-body)] leading-snug">
+                          <span className="font-mono text-[0.7rem] mr-2 opacity-50">{item.num}.</span>{item.title}
+                        </a>
+                        {item.subs && (
+                          <div className="flex flex-col gap-2 pl-6">
+                            {item.subs.map((sub) => (
+                              <a key={sub.id} href={`#${sub.id}`} className="text-pretty text-muted [font-size:var(--font-size-body)] leading-snug opacity-80">
+                                <span className="font-mono text-[0.7rem] mr-2 opacity-50">{sub.num}</span>{sub.title}
+                              </a>
+                            ))}
+                          </div>
+                        )}
+                      </div>
                     ))}
                   </div>
                 </div>
@@ -98,7 +136,8 @@ export default function PrivacyPolicyPage() {
                     <li>visitors to www.near.ai;</li>
                     <li>users of Agent Hosting at https://agent.near.ai/, including the managed agent hosting platform, APIs, and related features;</li>
                     <li>users of NEAR AI Cloud at https://cloud.near.ai/, to the extent they interact with NEAR AI&apos;s Websites or provide Business Contact Information for account administration;</li>
-                    <li>users of the IronClaw open-source framework (https://www.ironclaw.com/) to the extent they interact with NEAR AI Websites or create a NEAR AI account.</li>
+                    <li>users of the IronClaw open-source framework (https://www.ironclaw.com/) to the extent they interact with NEAR AI Websites or create a NEAR AI account; and</li>
+                    <li>users of the extension catalog for the IronClaw open-source framework, Ironhub located at https://hub.ironclaw.com/.</li>
                   </ul>
                   <p>By using the Services, you accept and agree to be bound by this Privacy Policy and the applicable Terms of Service. If you do not agree, you must not access or use the Services.</p>
                   <p>Our public marketing website (www.near.ai) may use analytics and advertising-related tracking technologies described in Section 4.</p>
@@ -136,7 +175,7 @@ export default function PrivacyPolicyPage() {
 
                   <p>Our infrastructure providers may process limited network metadata (e.g., IP addresses) to deliver the service.</p>
 
-                  <SubSection number="2.1" title="Analytics, Advertising, and Online Tracking">
+                  <SubSection id="section-2-1" number="2.1" title="Analytics, Advertising, and Online Tracking">
                     <p>We use analytics, advertising, and online tracking technologies on www.near.ai to understand website usage and, where enabled, to measure the effectiveness of our marketing campaigns. These technologies may include cookies, SDKs, pixels, and tags (collectively, &ldquo;Tracking Technologies&rdquo;).</p>
                     <p>As of the &ldquo;Last Updated&rdquo; date, the Tracking Technologies used on www.near.ai include:</p>
                     <ul>
@@ -145,7 +184,7 @@ export default function PrivacyPolicyPage() {
                       <li>Twitter/X Ads Pixel (advertising/measurement)</li>
                     </ul>
                     <p>These providers may collect or receive information such as page views, referring URLs, timestamps, device/browser characteristics, IP address (or derived approximate location), and event data. They may use cookies or similar identifiers to recognise your browser or device over time. Additionally, our advertising partners help us provide you with content we think will be of interest to you on our Services and across the Internet.</p>
-                    <p>Where required by law (e.g., in the UK/EEA), we will obtain your consent before placing non-essential cookies or enabling advertising-related pixels. You can manage your preferences via our cookie banner or by adjusting browser settings. For more information, see our Cookie Policy.</p>
+                    <p>Where required by law (e.g., in the UK/EEA), we will obtain your consent before placing non-essential cookies or enabling advertising-related pixels. You can manage your preferences via our cookie banner or by adjusting browser settings. For more information, see our Cookie Policy. If you are interested in more information about tailored browser advertising and how you can generally control cookies from being put on your computer to deliver tailored advertising, you may visit the Network Advertising Initiative&apos;s Consumer Opt-Out link or the Digital Advertising Alliance&apos;s Consumer Opt-Out link to opt-out of receiving tailored advertising from companies that participate in those programs.</p>
                     <p>Do Not Track: There is no uniform standard for responding to Do Not Track signals. At this time, the Services do not function differently based on a user&apos;s Do Not Track signal.</p>
                   </SubSection>
                 </Section>
@@ -174,8 +213,8 @@ export default function PrivacyPolicyPage() {
                   <ul>
                     <li><strong>Contractual Necessity (Art. 6(1)(b)).</strong> When processing is required for the performance of an agreement to which you are a party, including to set up and run your account, provide the Services, support you, apply your settings, and fulfil other contractual obligations.</li>
                     <li><strong>Legal Obligation (Art. 6(1)(c)).</strong> Where processing is necessary to comply with legal obligations, such as security and audit requirements, record-keeping, responding to lawful requests, and fulfilling data-rights requests.</li>
-                    <li><strong>Legitimate Interest (Art. 6(1)(f)).</strong> Where processing serves our legitimate interests, such as research and development, marketing and promotion, protection of our legal rights, keeping the service secure and reliable (logging, threat detection, abuse prevention), measuring and improving performance, running light product analytics, and defending legal claims.</li>
-                    <li><strong>Consent (Art. 6(1)(a)).</strong> Where you give us permission to collect and use your Personal Data for a specific purpose. You can withdraw consent at any time.</li>
+                    <li><strong>Legitimate Interest (Art. 6(1)(f)).</strong> Where processing serves our legitimate interests, such as research and development, marketing and promotion, protection of our legal rights, keeping the service secure and reliable (logging, threat detection, abuse prevention), measuring and improving performance, running light product analytics, and defending legal claims. We balance these interests against your rights and freedoms. You can object to processing based on legitimate interests at any time (see Section 8).</li>
+                    <li><strong>Consent (Art. 6(1)(a)).</strong> Where you give us permission to collect and use your Personal Data for a specific purpose. This may include optional features, marketing emails, or enabling advertising-related tracking technologies on our marketing website where required by law. You can withdraw consent at any time.</li>
                     <li><strong>Special Categories (Art. 9).</strong> The Services are not intended for special-category or criminal-convictions data. Please do not input such data unless it is necessary and permitted by law.</li>
                   </ul>
                 </Section>
@@ -191,18 +230,18 @@ export default function PrivacyPolicyPage() {
                   <p>How we disclose Personal Data depends on the product you use and your relationship with us, and may include:</p>
                   <ul>
                     <li><strong>Affiliates.</strong> We may disclose information among our group companies or affiliates for the business purposes described in this Policy.</li>
-                    <li><strong>Vendors and Service Providers.</strong> We engage vendors and service providers to perform business purposes on our behalf, including analytics, hosting, payment processing, fraud prevention and security, customer support tools, email and communications services, and database and archival services.</li>
-                    <li><strong>Website Analytics and Advertising Measurement</strong> (for www.near.ai), such as: PostHog; LinkedIn (Insight Tag); Twitter/X (Ads Pixel) to help us understand how you and our Users interact with the Services.</li>
+                    <li><strong>Vendors and Service Providers.</strong> We engage vendors and service providers to perform business purposes on our behalf, including analytics, hosting, payment processing, fraud prevention and security, customer support tools, email and communications services, and database and archival services. Service providers may use such information for their operational purposes in order to provide their services to us.</li>
+                    <li><strong>Website Analytics and Advertising Measurement</strong> (for www.near.ai), such as: PostHog; LinkedIn (Insight Tag); Twitter/X (Ads Pixel) to help us understand how you and our Users interact with the Services and, subject to applicable law, provide you with content that we and our advertising partners think will be of interest to you on our Services and across the Internet.</li>
                     <li><strong>Auditors, Accountants, and Lawyers.</strong> We may transfer your Personal Data to auditors, accountants, and lawyers in order to complete financial, technical, and legal audits, as well as for other legal requirements.</li>
-                    <li><strong>Law Enforcement and Regulators.</strong> We disclose information as appropriate when we have a good faith belief that such disclosure is necessary to protect legal rights, privacy, and safety; detect fraud or abuse; respond to lawful requests from government authorities; or comply with legal process.</li>
+                    <li><strong>Law Enforcement and Regulators.</strong> We disclose information as appropriate when we have a good faith belief that such disclosure is necessary to protect legal rights, privacy, and safety; detect fraud or abuse; respond to lawful requests from government authorities; or comply with legal process. Our ability to respond to lawful data requests varies by product.</li>
                     <li><strong>Business Transactions.</strong> In the event of a merger, acquisition, transfer of control, bankruptcy, reorganisation, or sale of assets, we may transfer information as part of that transaction.</li>
-                    <li><strong>Others.</strong> We may disclose your Personal Data where permitted or required by applicable law, including to comply with legal obligations, protect our rights, during emergencies, or with your consent.</li>
+                    <li><strong>Others (including where required, with Your Consent).</strong> We may disclose your Personal Data where permitted or required by applicable law, including to comply with legal obligations, protect our rights, during emergencies, or with your consent.</li>
                   </ul>
                 </Section>
 
                 {/* Section 7 */}
                 <Section id="section-7" number="7" title="Securing Your Personal Data">
-                  <p>We implement technical and organisational measures appropriate to the risk level of each product and service, including encryption in transit and at rest, access controls, continuous monitoring, and incident-response procedures. Where we use third-party service providers or model APIs, they operate under written data-processing terms and are subject to appropriate security and privacy due diligence.</p>
+                  <p>We implement technical and organisational measures appropriate to the risk level of each product and service, including encryption in transit and at rest, access controls, continuous monitoring, and incident-response procedures. Where we use third-party service providers or model APIs, they operate under written data-processing terms and are subject to appropriate security and privacy due diligence. For detailed information about our security practices, please visit our trust and security page.</p>
                   <p>No method of transmitting data over the internet or storing data is completely secure. While we work to protect your information, you acknowledge that you provide Personal Data at your own risk.</p>
                 </Section>
 
@@ -210,7 +249,7 @@ export default function PrivacyPolicyPage() {
                 <Section id="section-8" number="8" title="Your Rights">
                   <p>Depending on your location, you may have rights to access, correct, delete, or port your data, and to object to or restrict certain processing.</p>
 
-                  <SubSection number="8.1" title="General Rights">
+                  <SubSection id="section-8-1" number="8.1" title="General Rights">
                     <p>Your local laws (including applicable laws in the EU, UK, Switzerland, and certain states within the United States, such as California, Connecticut, Colorado, Delaware, Florida, Indiana, Iowa, Kentucky, Maryland, Montana, Minnesota, Nebraska, New Hampshire, New Jersey, Oregon, Rhode Island, Virginia, Tennessee, and Texas, as well as similar U.S. state laws) may permit you to request that we:</p>
                     <ul>
                       <li>provide access to and/or a copy of certain information we hold about you;</li>
@@ -231,25 +270,25 @@ export default function PrivacyPolicyPage() {
                     <p>Certain information may be exempt from such requests under applicable law such as information we retain for legal compliance and to secure, provide and audit our Services. We may need certain information in order to provide the Services to you; if you ask us to delete it, you may no longer be able to use the Services.</p>
                   </SubSection>
 
-                  <SubSection number="8.2" title="Exercising Your Rights">
+                  <SubSection id="section-8-2" number="8.2" title="Exercising Your Rights">
                     <p>You may exercise your rights through in-product settings where available, or by emailing us at <a href="mailto:privacy@near.ai" className="text-[#101010] underline decoration-[#CAC8C8] underline-offset-2">privacy@near.ai</a> or <a href="mailto:legal@near.ai" className="text-[#101010] underline decoration-[#CAC8C8] underline-offset-2">legal@near.ai</a>.</p>
                     <p>If you are a resident of Colorado, Connecticut, Delaware, Iowa, Indiana, Kentucky, Maryland, Minnesota, Montana, Nebraska, New Hampshire, New Jersey, Oregon, Rhode Island, Tennessee, Texas, and Virginia, you may have the right to appeal our decision to deny your request, if applicable. Your description must include your full name and the email address used for your account with us, along with a copy of the denial notice you received from us.</p>
                   </SubSection>
 
-                  <SubSection number="8.3" title="Marketing Communications">
+                  <SubSection id="section-8-3" number="8.3" title="Marketing Communications">
                     <p>To opt out of marketing communications, follow the unsubscribe instructions in the marketing communication or email us. We may still send you non-marketing communications (e.g., service announcements, security notices, transactional emails).</p>
                   </SubSection>
 
-                  <SubSection number="8.4" title="Notice of Right to Opt Out of Sales and Targeted Advertising">
-                    <p>Depending on your jurisdiction, you may have the right to opt out of &ldquo;sales&rdquo; of your personal information and/or &ldquo;sharing&rdquo; or processing of your personal information for targeted advertising.</p>
+                  <SubSection id="section-8-4" number="8.4" title="Notice of Right to Opt Out of Sales and Targeted Advertising">
+                    <p>Depending on your jurisdiction (such as certain states listed above), you may have the right to opt out of &ldquo;sales&rdquo; of your personal information and/or &ldquo;sharing&rdquo; or processing of your personal information for targeted advertising.</p>
                     <ul>
                       <li>We do not sell personal information for money. However, allowing third-party advertising/measurement pixels to collect data from our marketing website may be considered a &ldquo;sale&rdquo; or &ldquo;sharing&rdquo; for cross-context behavioural advertising under certain U.S. state privacy laws.</li>
-                      <li>You may opt out of such sharing/targeted advertising by using our cookie preference tools (where available) or by enabling legally recognised opt-out signals such as Global Privacy Control (GPC).</li>
+                      <li>You may opt out of such sharing/targeted advertising by using our cookie preference tools (where available) or by enabling legally recognised opt-out signals such as Global Privacy Control (GPC), which we will honour where required by applicable law.</li>
                       <li>We do not knowingly sell or share the personal information of minors under 16 years of age without legally required affirmative authorisation.</li>
                     </ul>
                   </SubSection>
 
-                  <SubSection number="8.5" title="Additional Rights for Users in the EEA, UK, and Other Applicable Jurisdictions">
+                  <SubSection id="section-8-5" number="8.5" title="Additional Rights for Users in the EEA, UK, and Other Applicable Jurisdictions">
                     <p>If you are located in the European Economic Area (EEA), the United Kingdom (UK), or another jurisdiction that grants similar privacy rights, you may have additional rights under applicable data protection laws, including the GDPR. These may include the right to withdraw consent, the right to object, the right of access, the right to rectification, the right to erasure, the right to data portability, and the right to make a formal complaint to your competent data protection authority.</p>
                   </SubSection>
                 </Section>
@@ -270,7 +309,7 @@ export default function PrivacyPolicyPage() {
                       <tbody className="divide-y divide-[#CAC8C8]">
                         {[
                           ["Contact information (e.g., email address)", "Provide Services; communicate; personalise; analyse and improve Services; marketing; security/fraud prevention; legal compliance; business transfers", "Yes"],
-                          ["Device and online information (e.g., IP address, browsing history, usage information)", "Provide Services; communicate; personalise; analyse and improve Services; marketing; security/fraud prevention; legal compliance; business transfers", "Yes"],
+                          ["Device and online information (e.g., IP address, browsing history, usage information, including general location inferred from IP address)", "Provide Services; communicate; personalise; analyse and improve Services; marketing; security/fraud prevention; legal compliance; business transfers", "Yes"],
                           ["Commercial information (e.g., transactions and subscription plans)", "Provide Services; analyse and improve Services; security/fraud prevention; legal compliance; business transfers", "Yes"],
                           ["Account credentials", "Provide Services; analyse and improve Services; security/fraud prevention; legal compliance; business transfers", "No sale/share"],
                           ["Information in connection with your use of the Services", "Provide Services; analyse and improve Services; security/fraud prevention; legal compliance; business transfers", "No sale/share"],
@@ -286,7 +325,8 @@ export default function PrivacyPolicyPage() {
                   </div>
 
                   <p>CCPA Rights: As a California resident, you have the following rights: the right to know, the right to delete, the right to correct, the right to opt out of sale or sharing, the right to limit use of sensitive personal information, and the right to non-discrimination. You can submit a request to <a href="mailto:legal@near.ai" className="text-[#101010] underline decoration-[#CAC8C8] underline-offset-2">legal@near.ai</a> or <a href="mailto:privacy@near.ai" className="text-[#101010] underline decoration-[#CAC8C8] underline-offset-2">privacy@near.ai</a>. We collect account credentials (username and password), which is considered sensitive personal information under the CCPA; we do not process such information for a purpose that would require us to provide a &lsquo;right to limit.&rsquo;</p>
-                  <p>Sale/Sharing of Personal Information: You have the right to opt out of the sharing/sale of your personal information for purposes of online analytics and advertising by clicking the &ldquo;Your Privacy Choices&rdquo; link on our website footer. Over the last 12 months, we have not knowingly &ldquo;sold&rdquo; or &ldquo;shared&rdquo; personal information of individuals under 16.</p>
+                  <p>If we ever offer any financial incentives in exchange for your personal information, we will provide you with appropriate information about such incentives.</p>
+                  <p>Sale/Sharing of Personal Information: You have the right to opt out of the sharing/sale of your personal information for purposes of online analytics and advertising by clicking the &ldquo;Your Privacy Choices&rdquo; link on our website footer. To opt out of any such disclosures made through means other than cookies and similar technologies, please email us at <a href="mailto:privacy@near.ai" className="text-[#101010] underline decoration-[#CAC8C8] underline-offset-2">privacy@near.ai</a>. Over the last 12 months, we have not knowingly &ldquo;sold&rdquo; or &ldquo;shared&rdquo; personal information of individuals under 16.</p>
                   <p>Shine the Light: The California &lsquo;Shine the Light&rsquo; law gives residents of California the right under certain circumstances to opt out of the disclosure of certain categories of personal information (as defined in the Shine the Light law) with third parties for their direct marketing purposes, or in the alternative, that we provide a cost-free means for consumers to opt out of any such disclosure. We do not currently disclose your personal information to third parties for their own direct marketing purposes. To opt out of activities that are considered &lsquo;sales&rsquo; or &lsquo;sharing&rsquo; under California law, please see the &lsquo;Sale/Sharing of Personal Information&rsquo; section above.</p>
                 </Section>
 
@@ -304,7 +344,7 @@ export default function PrivacyPolicyPage() {
                 {/* Section 11 */}
                 <Section id="section-11" number="11" title="Minors">
                   <p>All Services are intended solely for individuals aged 18 or older. By accessing or using any of the Services, you represent and warrant that you are at least 18 years of age. We do not permit use of the Services by anyone under 18, regardless of parental consent.</p>
-                  <p>We do not knowingly collect Personal Data from individuals under 18 in connection with our Services. If we become aware that we have inadvertently collected such data, we will take reasonable steps to delete it promptly.</p>
+                  <p>We do not knowingly collect Personal Data from individuals under 18 in connection with our Services. If we become aware that we have inadvertently collected such data, we will take reasonable steps to delete it promptly. We may adjust eligibility thresholds where required by applicable law.</p>
                 </Section>
 
                 {/* Section 12 */}
@@ -324,7 +364,8 @@ export default function PrivacyPolicyPage() {
                   </SubSection>
 
                   <SubSection number="" title="Data Usage">
-                    <p>Google user data is accessed solely to execute actions you initiate through the AI assistant. Retrieved data is passed to the language model within your conversation context to generate responses and carry out your instructions. We do not use Google user data to train, retrain, or fine-tune any AI models.</p>
+                    <p>Google user data is accessed solely to execute actions you initiate through the AI assistant — for example, reading an email, creating a calendar event, or editing a document. Retrieved data is passed to the language model within your conversation context to generate responses and carry out your instructions.</p>
+                    <p>We do not use Google user data to train, retrain, or fine-tune any AI models.</p>
                   </SubSection>
 
                   <SubSection number="" title="Data Sharing">
@@ -332,7 +373,7 @@ export default function PrivacyPolicyPage() {
                   </SubSection>
 
                   <SubSection number="" title="Data Storage & Protection">
-                    <p>OAuth access and refresh tokens are encrypted at rest using AES-256-GCM encryption. Tokens are injected at runtime through a sandboxed execution boundary. All communication with Google APIs occurs over HTTPS/TLS. Google API responses are processed in-memory within your active conversation session and are not persisted to disk or database unless you explicitly choose to save information to your workspace.</p>
+                    <p>OAuth access and refresh tokens are encrypted at rest using AES-256-GCM encryption. Tokens are injected at runtime through a sandboxed execution boundary — application tool code never has direct access to raw token values. All communication with Google APIs occurs over HTTPS/TLS. Google API responses are processed in-memory within your active conversation session and are not persisted to disk or database unless you explicitly choose to save information to your workspace.</p>
                   </SubSection>
 
                   <SubSection number="" title="Data Retention & Deletion">
@@ -390,9 +431,9 @@ function Section({ id, number, title, children }: { id: string; number: string; 
   );
 }
 
-function SubSection({ number, title, children }: { number: string; title: string; children: React.ReactNode }) {
+function SubSection({ id, number, title, children }: { id?: string; number: string; title: string; children: React.ReactNode }) {
   return (
-    <div className="mt-4 flex flex-col gap-3">
+    <div id={id} className="mt-4 flex flex-col gap-3">
       <h3 className="font-medium text-[#101010]" style={{ fontSize: "var(--font-size-body)" }}>
         {number && <span className="font-mono text-[0.7rem] text-muted mr-2">{number}</span>}
         {title}

@@ -16,17 +16,28 @@ export default function CompanyAnimations() {
     const mm = gsap.matchMedia();
 
     mm.add("(min-width: 1024px) and (prefers-reduced-motion: no-preference)", () => {
+      const BOTTOM_GAP = 56; // px, keeps card clear of hero's bottom edge on short viewports
+
       gsap.fromTo(
         card,
         { y: "100vh" },
         {
-          y: "30vh",
+          y: () => {
+            const heroHeight = hero.offsetHeight;
+            const cardHeight = card.offsetHeight;
+            const centeredTop = (heroHeight - cardHeight) / 2;
+            const desiredTop = centeredTop + heroHeight * 0.3;
+            const maxTop = heroHeight - cardHeight - BOTTOM_GAP;
+            const top = Math.min(desiredTop, maxTop);
+            return top - centeredTop;
+          },
           ease: "none",
           scrollTrigger: {
             trigger: "[data-mission-wrapper]",
             start: "top top",
             end: "bottom bottom",
             scrub: 0.2,
+            invalidateOnRefresh: true,
           },
         }
       );

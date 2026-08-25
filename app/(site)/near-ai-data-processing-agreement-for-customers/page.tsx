@@ -19,6 +19,7 @@ const TOC = [
 const SUBPROCESSORS = [
   ["Amazon Web Services, Inc. (S3)", "Infrastructure", "United States"],
   ["Corvex, Inc.", "Infrastructure", "United States"],
+  ["Rshere Tech Inc.", "Infrastructure", "India"],
   ["OVH SAS", "Infrastructure", "United States"],
   ["Google LLC", "Infrastructure/LLM Provider/Authentication", "United States"],
   ["Railway Corporation", "Infrastructure", "United States"],
@@ -30,13 +31,12 @@ const SUBPROCESSORS = [
   ["Hot Labs", "Payments", "Decentralized network"],
   ["Datadog, Inc.", "Observability", "United States"],
   ["PostHog, Inc.", "Observability", "United States"],
-  ["Anthropic PBC", "Inference", "United States"],
   ["Slack Technologies Inc.", "Customer Communication", "United States"],
   ["Crisp IM SAS", "Customer Support", "EU"],
   ["OpenAI", "LLM Provider", "United States"],
   ["Chutes Global Corp", "LLM Provider", "Decentralized network"],
   ["Anthropic PBC", "LLM Provider", "United States"],
-  ["OpenRouter, Inc.", "AI Model Routing and Inference Services", "United States for OpenRouter systems; downstream model-provider locations vary by selected model/provider."],
+  ["OpenRouter, Inc.", "LLM Provider", "United States"],
   ["Brave Software, Inc.", "Search", "United States"],
 ];
 
@@ -55,7 +55,7 @@ export default function DPAPage() {
                 NEAR AI Data Processing Agreement for Customers
               </h1>
               <p className="mt-3 font-mono text-[0.75rem] uppercase tracking-[0.25em] text-white/50">
-                Last Updated — July 17, 2026
+                Last Updated — August 17, 2026
               </p>
             </div>
           </div>
@@ -84,7 +84,7 @@ export default function DPAPage() {
 
                 {/* Intro */}
                 <div className="mb-12 flex flex-col gap-4 text-muted leading-[1.8]" style={{ fontSize: "var(--font-size-body)" }}>
-                  <p>This Data Processing Agreement (&ldquo;DPA&rdquo;) is incorporated into and forms part of (and if applicable, amends the current version of) the Terms of Service between Customer and/or its affiliates (&ldquo;Customer&rdquo;) and NEAR AI (&ldquo;NEAR AI&rdquo;), each a &ldquo;Party&rdquo; and collectively the &ldquo;Parties&rdquo;. This DPA applies to and takes precedence over the agreement between the Parties and any associated contractual document between the Parties, such as an order form, statement of work, or data processing agreement thereunder (collectively, the &ldquo;Agreement&rdquo;), to the extent of any conflict. Capitalized terms not defined herein are defined as in applicable Data Protection Laws. Customer and NEAR AI agree as follows:</p>
+                  <p>This Data Processing Agreement (&ldquo;DPA&rdquo;) is incorporated into and forms part of (and if applicable, amends the current version of) the Terms of Service or the Master Platform Agreement between Customer and/or its affiliates (&ldquo;Customer&rdquo;) and NEAR AI (&ldquo;NEAR AI&rdquo;), each a &ldquo;Party&rdquo; and collectively the &ldquo;Parties&rdquo;. This DPA applies to and takes precedence over the agreement between the Parties and any associated contractual document between the Parties, such as an order form, statement of work, or data processing agreement thereunder (collectively, the &ldquo;Agreement&rdquo;), to the extent of any conflict. Capitalized terms not defined herein are defined as in applicable Data Protection Laws. Customer and NEAR AI agree as follows:</p>
 
                   {/* Mobile TOC */}
                   <div className="lg:hidden mt-4 border border-[#CAC8C8] rounded-2xl p-6 flex flex-col gap-2">
@@ -115,7 +115,7 @@ export default function DPAPage() {
                 <Section id="section-2" number="2" title="Scope and Purposes of Processing.">
                   <ol>
                     <li>The scope, nature, purposes, and duration of the processing, the types of Personal Data Processed, and the Data Subjects concerned are set forth in this DPA, including its Schedule A. The details provided in Schedule A are deemed to satisfy any requirement to provide such details under any Data Protection Law.</li>
-                    <li>NEAR AI will Process Personal Data solely: (1) to fulfill its obligations to Customer under these Terms, including this DPA; (2) on Customer&apos;s behalf; and (3) in compliance with Data Protection Laws. NEAR AI will not &ldquo;sell&rdquo; Personal Data (as such term in quotation marks is defined in applicable Data Protection Laws), &ldquo;share&rdquo; or Process Personal Data for purposes of &ldquo;cross-context behavioral advertising&rdquo; or &ldquo;targeted advertising&rdquo; (as such terms in quotation marks are defined in applicable Data Protection Laws), or otherwise Process Personal Data for any purpose other than for the specific purposes set forth herein or outside of the direct business relationship with Customer. For the avoidance of doubt, NEAR AI will Process Personal Data solely to provide the cloud processing services to Customer as set forth in these Terms, or as otherwise permitted by Data Protection Laws (for example, to comply with NEAR AI&apos;s legal obligations). Notwithstanding anything to the contrary in this DPA, NEAR AI may process Personal Data as an independent Controller for its own legitimate business operations, including security, fraud prevention, compliance, internal reporting, and product development and improvement, in each case as described in NEAR AI&apos;s Privacy Policy.</li>
+                    <li>NEAR AI will Process Personal Data solely: (1) to fulfill its obligations to Customer under the Agreement, including this DPA; (2) on Customer&apos;s behalf; and (3) in compliance with Data Protection Laws. NEAR AI will not &ldquo;sell&rdquo; Personal Data (as such term in quotation marks is defined in applicable Data Protection Laws), &ldquo;share&rdquo; or Process Personal Data for purposes of &ldquo;cross-context behavioral advertising&rdquo; or &ldquo;targeted advertising&rdquo; (as such terms in quotation marks are defined in applicable Data Protection Laws), or otherwise Process Personal Data for any purpose other than for the specific purposes set forth herein or outside of the direct business relationship with Customer. For the avoidance of doubt, NEAR AI will Process Personal Data solely to provide the cloud processing services to Customer as set forth in the Agreement, or as otherwise permitted by Data Protection Laws (for example, to comply with NEAR AI&apos;s legal obligations). Notwithstanding anything to the contrary in this DPA, NEAR AI may process Personal Data as an independent Controller for its own legitimate business operations, including security, fraud prevention, compliance, and internal reporting, in each case as described in NEAR AI&apos;s Privacy Policy. In addition, NEAR AI may process Personal Data as an Independent Controller for product development and improvement solely in connection with the AI Agent Hosting Service and the White-Labeled AI Agent Service (as described in Appendix A and Appendix B, respectively). NEAR AI does not process Personal Data as an Independent Controller for product development or improvement in connection with the NEAR AI Cloud Services and Inference API (as described in Appendix C).</li>
                     <li>NEAR AI will comply with any applicable restrictions under Data Protection Laws on combining the Personal Data with personal data that NEAR AI receives from, or on behalf of, another person or persons, or that NEAR AI collects from any interaction between it and any Data Subject.</li>
                     <li>NEAR AI will provide the same level of protection for the Personal Data as is required under Data Protection Laws applicable to Customer.</li>
                     <li>Customer retains the right, upon notice, to take reasonable steps to stop and remediate unauthorized use of Personal Data, including any use of Personal Data not expressly authorized in this DPA.</li>
@@ -317,7 +317,7 @@ function Section({ id, number, title, children }: { id: string; number: string; 
           {title}
         </h2>
       </div>
-      <div className="flex flex-col gap-4 text-muted leading-[1.8] [&_ul]:list-disc [&_ul]:pl-6 [&_ul]:flex [&_ul]:flex-col [&_ul]:gap-2 [&_ol]:list-decimal [&_ol]:pl-6 [&_ol]:flex [&_ol]:flex-col [&_ol]:gap-2 [&_ol_ol]:mt-2 [&_strong]:font-medium [&_strong]:text-[#101010]" style={{ fontSize: "var(--font-size-body)" }}>
+      <div className="flex flex-col gap-4 text-muted leading-[1.8] break-words [&_ul]:list-disc [&_ul]:pl-6 [&_ul]:flex [&_ul]:flex-col [&_ul]:gap-2 [&_ol]:list-decimal [&_ol]:pl-6 [&_ol]:flex [&_ol]:flex-col [&_ol]:gap-2 [&_ol_ol]:mt-2 [&_strong]:font-medium [&_strong]:text-[#101010]" style={{ fontSize: "var(--font-size-body)" }}>
         {children}
       </div>
     </div>

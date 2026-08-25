@@ -4,8 +4,8 @@ import SiteHeader from "@/components/site/SiteHeader";
 const TOC = [
   "Introduction",
   "What are Cookies?",
-  "What Do We Collect?",
-  "Why shall we collect and use Cookies",
+  "What we use cookies for",
+  "Why we collect and use Cookies",
   "Third Party Cookies",
   "How Long Will The Cookies Stay On My Browsing Device?",
   "Your Cookie Choices",
@@ -33,7 +33,7 @@ export default function CookiePolicyPage() {
                 Cookie Policy
               </h1>
               <p className="mt-3 font-mono text-[0.75rem] uppercase tracking-[0.25em] text-white/50">
-                Last Updated — January 26, 2026
+                Last Updated — August 10, 2026
               </p>
             </div>
           </div>
@@ -66,18 +66,20 @@ export default function CookiePolicyPage() {
 
                 {/* Section 1 */}
                 <Section id="section-1" number="1" title="Introduction">
-                  <p>This Cookie Policy (&lsquo;Cookie Policy&rsquo; or &lsquo;Policy&rsquo;) explains how Jasnah Inc., d/b/a Near AI (&lsquo;Near AI,&rsquo; &lsquo;we,&rsquo; &lsquo;our,&rsquo; or &lsquo;us&rsquo;), uses cookies and similar tracking technologies in connection with our website and related services.</p>
-                  <p>This Policy applies when you (&lsquo;User&rsquo;, &lsquo;you&rsquo;, or &lsquo;your&rsquo;) access or interact with:</p>
+                  <p>This Cookie Policy (&ldquo;Cookie Policy&rdquo; or &ldquo;Policy&rdquo;) explains how Jasnah Inc., d/b/a Near AI (&ldquo;Near AI,&rdquo; &ldquo;we,&rdquo; &ldquo;our,&rdquo; or &ldquo;us&rdquo;), uses cookies and similar tracking technologies in connection with our website and related services.</p>
+                  <p>This Policy applies when you (&ldquo;User&rdquo;, &ldquo;you&rdquo;, or &ldquo;your&rdquo;) access or interact with:</p>
                   <ul>
                     <li><a href="https://www.near.ai" target="_blank" rel="noopener noreferrer" className="text-[#101010] underline decoration-[#CAC8C8] underline-offset-2 break-all">www.near.ai</a></li>
                     <li><a href="https://cloud.near.ai/" target="_blank" rel="noopener noreferrer" className="text-[#101010] underline decoration-[#CAC8C8] underline-offset-2 break-all">https://cloud.near.ai/</a></li>
-                    <li><a href="https://private-chat.near.ai" target="_blank" rel="noopener noreferrer" className="text-[#101010] underline decoration-[#CAC8C8] underline-offset-2 break-all">https://private-chat.near.ai</a></li>
+                    <li><a href="https://agent.near.ai/" target="_blank" rel="noopener noreferrer" className="text-[#101010] underline decoration-[#CAC8C8] underline-offset-2 break-all">https://agent.near.ai/</a></li>
+                    <li><a href="https://www.ironclaw.com/" target="_blank" rel="noopener noreferrer" className="text-[#101010] underline decoration-[#CAC8C8] underline-offset-2 break-all">https://www.ironclaw.com/</a></li>
+                    <li><a href="https://hub.ironclaw.com/" target="_blank" rel="noopener noreferrer" className="text-[#101010] underline decoration-[#CAC8C8] underline-offset-2 break-all">https://hub.ironclaw.com/</a></li>
                     <li>job application portals, recruitment sites, and other digital properties operated by Near AI</li>
                   </ul>
-                  <p>(collectively, the &lsquo;Website&rsquo; or &lsquo;Websites&rsquo;).</p>
-                  <p>This Cookie Policy primarily applies to our public marketing website (www.near.ai). Authenticated product interfaces (cloud.near.ai and private-chat.near.ai) use only strictly necessary cookies required for security and functionality and do not use third-party advertising cookies.</p>
+                  <p>(collectively, the &ldquo;Website&rdquo; or &ldquo;Websites&rdquo;).</p>
+                  <p>This Cookie Policy primarily applies to our public marketing website (www.near.ai). Authenticated product interfaces (cloud.near.ai, agent.near.ai, ironclaw.com, hub.ironclaw.com) use only strictly necessary cookies required for security and functionality and do not use third-party advertising cookies.</p>
                   <p>This Cookie Policy forms part of our broader Privacy Policy, which explains how we collect, use, and share your Personal Data (as defined therein). We are committed to handling your information in accordance with applicable privacy and data protection laws in the United States, the European Union, the United Kingdom, and other relevant jurisdictions.</p>
-                  <p>For how we process personal data more generally, see our <a href="/privacy-policy" className="text-[#101010] underline decoration-[#CAC8C8] underline-offset-2">here</a>.</p>
+                  <p>For how we process personal data more generally, see our <a href="/privacy-policy" className="text-[#101010] underline decoration-[#CAC8C8] underline-offset-2">Privacy Policy</a>.</p>
 
                   {/* Mobile TOC */}
                   <div className="lg:hidden mt-4 border border-[#CAC8C8] rounded-2xl p-6 flex flex-col gap-2">
@@ -90,7 +92,11 @@ export default function CookiePolicyPage() {
                   </div>
 
                   <SubSection number="" title="Definitions">
-                    <p>&lsquo;Personal Data&rsquo; means any information relating to an identified or identifiable individual, as defined under applicable data protection laws. &lsquo;Cookies&rsquo; refer to small text files placed on your device by websites you visit, used to store information and preferences to enhance user experience.</p>
+                    <p>&ldquo;Personal Data&rdquo; means any information relating to an identified or identifiable individual, as defined under applicable data protection laws.</p>
+                    <p>&ldquo;Cookies&rdquo; refers to small text files and related technologies (e.g., pixels, tags, SDKs, local storage) placed on your device to store information or facilitate certain features.</p>
+                    <p>&ldquo;First-party Cookies&rdquo; are set by Near AI.</p>
+                    <p>&ldquo;Third-party Cookies&rdquo; are set by external service providers.</p>
+                    <p>&ldquo;Services&rdquo; refers collectively to the Websites and any related online features, tools, or functionality provided by Near AI.</p>
                   </SubSection>
                 </Section>
 
@@ -100,7 +106,7 @@ export default function CookiePolicyPage() {
                 </Section>
 
                 {/* Section 3 */}
-                <Section id="section-3" number="3" title="What Do We Collect?">
+                <Section id="section-3" number="3" title="What we use cookies for">
                   <p>When you access or interact with the Websites, we may place the following categories of Cookies on your device.</p>
                   <SubSection number="" title="A. Strictly Necessary Cookies">
                     <p>These Cookies are essential for the Websites to function and cannot be turned off in our systems. They are typically set in response to actions taken by you, such as:</p>
@@ -174,7 +180,7 @@ export default function CookiePolicyPage() {
                 </Section>
 
                 {/* Section 4 */}
-                <Section id="section-4" number="4" title="Why shall we collect and use Cookies">
+                <Section id="section-4" number="4" title="Why we collect and use Cookies">
                   <p>We may collect and use cookies for a variety of purposes, including but not limited to:</p>
                   <ul>
                     <li>Enhancing your experience, navigation, and interaction with our Website</li>
@@ -188,13 +194,13 @@ export default function CookiePolicyPage() {
                 <Section id="section-5" number="5" title="Third Party Cookies">
                   <p>We use trusted analytics and infrastructure providers such as PostHog and Cloudflare, who may place Cookies on your device.</p>
                   <p>PostHog provides first-party analytics to help us understand website usage and improve performance. Cloudflare helps us analyze how our Websites are used. Cloudflare uses performance Cookies to track visitor interactions. For example, by using Cookies, Cloudflare can tell us which pages our users view, which are most popular, what time of day our websites are visited, whether visitors have been to our websites before, what website referred the visitor to our websites, and other similar information.</p>
-                  <p>We have little control over these &lsquo;third party&rsquo; Cookies, so we suggest that you check the respective privacy policies for these external services to help you understand what data these organizations hold about you and what they do with it.</p>
+                  <p>We have little control over these &ldquo;third party&rdquo; Cookies, so we suggest that you check the respective privacy policies for these external services to help you understand what data these organizations hold about you and what they do with it.</p>
                 </Section>
 
                 {/* Section 6 */}
                 <Section id="section-6" number="6" title="How Long Will The Cookies Stay On My Browsing Device?">
-                  <p>The length of time a cookie will stay on your browsing device depends on whether it is a &lsquo;persistent&rsquo; or &lsquo;session&rsquo; cookie. Session cookies will only stay on your device until you close your browser. Persistent cookies will stay on your device between browsing session (i.e., they do not expire when you close your browser). The length of time a persistent cookie stays on your device varies from cookie to cookie.</p>
-                  <p>Some Cookies operate from the time you visit a Website or to the end of that particular web-browsing session. These Cookies expire and are automatically deleted when you close your internet browser. These are &lsquo;Session&rsquo; cookies, which last until you close your browser.</p>
+                  <p>The length of time a cookie will stay on your browsing device depends on whether it is a &ldquo;persistent&rdquo; or &ldquo;session&rdquo; cookie. Session cookies will only stay on your device until you close your browser. Persistent cookies will stay on your device between browsing session (i.e., they do not expire when you close your browser). The length of time a persistent cookie stays on your device varies from cookie to cookie.</p>
+                  <p>Some Cookies operate from the time you visit a Website or to the end of that particular web-browsing session. These Cookies expire and are automatically deleted when you close your internet browser. These are &ldquo;Session&rdquo; cookies, which last until you close your browser.</p>
                 </Section>
 
                 {/* Section 7 */}
@@ -230,7 +236,7 @@ export default function CookiePolicyPage() {
                 {/* Section 11 */}
                 <Section id="section-11" number="11" title="Contact Us">
                   <p>If you have any inquiries or concerns regarding this Policy, please do not hesitate to contact us at:</p>
-                  <p>Email: <a href="/mailto:operations@nearprime.com" className="text-[#101010] underline decoration-[#CAC8C8] underline-offset-2">operations@nearprime.com</a> and <a href="/mailto:legal@near.ai" className="text-[#101010] underline decoration-[#CAC8C8] underline-offset-2">legal@near.ai</a></p>
+                  <p>Email: <a href="mailto:privacy@near.ai" className="text-[#101010] underline decoration-[#CAC8C8] underline-offset-2">privacy@near.ai</a> or <a href="mailto:legal@near.ai" className="text-[#101010] underline decoration-[#CAC8C8] underline-offset-2">legal@near.ai</a></p>
                 </Section>
 
               </div>

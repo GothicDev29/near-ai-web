@@ -9,17 +9,23 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@near/cms-core/components/ui/dialog";
-import GetInTouchForm from "@/components/site/GetInTouchForm";
+import GetInTouchForm, { type Screen } from "@/components/site/GetInTouchForm";
 
-export default function GetInTouchModal() {
+export default function GetInTouchModal({
+  dark = true,
+  entryPoint = "site-header",
+}: {
+  dark?: boolean;
+  entryPoint?: string;
+}) {
   const [open, setOpen] = useState(false);
-  const [step, setStep] = useState<1 | 2>(1);
+  const [screen, setScreen] = useState<Screen>(1);
   const [formKey, setFormKey] = useState(0);
 
   function handleOpenChange(val: boolean) {
     setOpen(val);
     if (!val) {
-      setStep(1);
+      setScreen(1);
       setFormKey((k) => k + 1);
     }
   }
@@ -27,7 +33,13 @@ export default function GetInTouchModal() {
   return (
     <Dialog open={open} onOpenChange={handleOpenChange}>
       <DialogTrigger asChild>
-        <button className="border border-white/40 rounded-full px-4 py-1.5 text-white/80 hover:text-white hover:border-white/70 transition-colors cursor-pointer">
+        <button
+          className={
+            dark
+              ? "border border-white/40 rounded-full px-4 py-1.5 text-white/80 hover:text-white hover:border-white/70 transition-colors cursor-pointer"
+              : "border border-[#101010]/30 rounded-full px-4 py-1.5 text-[#101010]/80 hover:text-[#101010] hover:border-[#101010]/60 transition-colors cursor-pointer"
+          }
+        >
           GET IN TOUCH
         </button>
       </DialogTrigger>
@@ -70,10 +82,14 @@ export default function GetInTouchModal() {
           {/* Progress + close */}
           <div className="relative z-10 flex items-center gap-3">
             <div className="flex gap-1.5 flex-1">
-              <div className="h-0.5 flex-1 rounded-full bg-white/80" />
-              <div className={`h-0.5 flex-1 rounded-full transition-colors duration-300 ${
-                step === 2 ? "bg-white/80" : "bg-white/25"
-              }`} />
+              {[1, 2, 3].map((n) => (
+                <div
+                  key={n}
+                  className={`h-0.5 flex-1 rounded-full transition-colors duration-300 ${
+                    screen >= n ? "bg-white/80" : "bg-white/25"
+                  }`}
+                />
+              ))}
             </div>
             <DialogClose asChild>
               <button
@@ -95,8 +111,8 @@ export default function GetInTouchModal() {
 
         <GetInTouchForm
           key={formKey}
-          onStepChange={setStep}
-          onSuccess={() => setOpen(false)}
+          onScreenChange={setScreen}
+          entryPoint={entryPoint}
         />
       </DialogContent>
     </Dialog>
